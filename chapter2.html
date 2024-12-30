@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Diary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="chapter2.css">
+</head>
+<body>
+    <div class="chapter2scn1" id="intro-section">
+        <div class="head_text">
+            My Old Love Diary
+            <span onclick="startScene()">🔑</span>
+        </div>
+    </div>
+    <div class="container" id="content-section" style="display: none;">
+        <div class="left-part">
+            <div class="photo-frame" id="image">
+                <div class="pin"></div>
+            </div>
+            <div class="paper-curl"></div>
+            <div class="heart">💖</div>
+        </div>
+        <div class="right-part" id="text-container"></div>
+    </div>
+    <script>
+        const images = [
+            'https://via.placeholder.com/800x800/FFD700/FFFFFF?text=Love+1',
+            'https://via.placeholder.com/800x800/F0E68C/FFFFFF?text=Love+2',
+            'https://via.placeholder.com/800x800/BC8F8F/FFFFFF?text=Love+3',
+            'https://via.placeholder.com/800x800/DAA520/FFFFFF?text=Love+4',
+            'https://via.placeholder.com/800x800/FFC0CB/FFFFFF?text=Love+5',
+            'https://via.placeholder.com/800x800/FFE4E1/FFFFFF?text=Love+6'
+        ];
+
+        const textSets = [
+            ["The greatest treasure I ever found is you.", "Every moment together is special."],
+            ["When you hold my hand, I feel home.", "You complete me in ways words can't describe."],
+            ["From the first moment, you made my heart flutter.", "I love you more each day."],
+            ["Forever and always, you're my love.", "Nothing in the world will change how I feel."],
+            ["Every smile you give lights up my soul.", "Our journey together is my favorite story."],
+            ["You are my heart's melody.", "With you, every day is a dream come true."]
+        ];
+
+        const quests = [
+            { question: "What was the first place you visited together?", answer: "xyz" },
+            { question: "Write a short note about your favorite memory with your loved one.", answer: "xyz" }
+        ];
+
+        let currentIndex = 0;
+        let pageCounter = 0;
+        const imageDiv = document.getElementById('image');
+        const textContainer = document.getElementById('text-container');
+        const introSection = document.getElementById('intro-section');
+        const contentSection = document.getElementById('content-section');
+        let answers = [];
+
+        function updateContent(index) {
+            imageDiv.style.backgroundImage = `url(${images[index]})`;
+            const texts = textSets[index];
+            textContainer.innerHTML = '';
+
+            let i = 0;
+            function appendText() {
+                console.log(currentIndex);
+                if(currentIndex>=6){
+                    window.location.href = "chapter3.html";
+                }
+                if (i < texts.length) {
+                    const p = document.createElement('p');
+                    p.textContent = texts[i];
+                    p.style.opacity = 0;
+                    textContainer.appendChild(p);
+                    p.animate(
+                        [{ opacity: 0 }, { opacity: 1 }],
+                        { duration: 1000, easing: 'ease-in-out', fill: 'forwards' }
+                    );
+                    i++;
+                    setTimeout(appendText, 2000);
+                } else {
+                    pageCounter++;
+                    if (pageCounter % 2 === 0 && Math.floor(pageCounter / 2) - 1 < quests.length) {
+                        displayQuest(quests[Math.floor(pageCounter / 2) - 1]);
+                    } else {
+                        currentIndex = (currentIndex + 1);
+                        setTimeout(() => updateContent(currentIndex), 3000);
+                    }
+                }
+            }
+            appendText();
+        }
+
+        function displayQuest(questObj) {
+            textContainer.innerHTML = '';
+            const questContainer = document.createElement('div');
+            questContainer.style.margin = '20px';
+            questContainer.style.padding = '15px';
+            questContainer.style.border = '2px dashed #7e5c4e';
+            questContainer.style.backgroundColor = '#f9f1e2';
+            questContainer.style.borderRadius = '12px';
+            questContainer.style.textAlign = 'center';
+
+            const questText = document.createElement('p');
+            questText.textContent = questObj.question;
+            questText.style.fontSize = '1.5rem';
+            questText.style.color = '#3e312f';
+            questText.style.marginBottom = '10px';
+
+            const inputField = document.createElement('input');
+            inputField.type = 'text';
+            inputField.placeholder = 'Your answer here';
+            inputField.style.margin = '10px 0';
+            inputField.style.padding = '10px';
+            inputField.style.width = '80%';
+            inputField.style.border = '1px solid #ccc';
+            inputField.style.borderRadius = '8px';
+            inputField.style.fontSize = '1rem';
+
+            const continueButton = document.createElement('button');
+            continueButton.textContent = 'Continue';
+            continueButton.style.padding = '10px 20px';
+            continueButton.style.backgroundColor = '#7e5c4e';
+            continueButton.style.color = '#fff';
+            continueButton.style.border = 'none';
+            continueButton.style.borderRadius = '8px';
+            continueButton.style.cursor = 'pointer';
+            continueButton.style.fontSize = '1rem';
+            continueButton.style.marginTop = '10px';
+            continueButton.addEventListener('click', () => {
+                const userAnswer = inputField.value.trim();
+                if (userAnswer.toLowerCase() === questObj.answer.toLowerCase()) {
+                    answers.push(userAnswer);
+                    currentIndex = (currentIndex + 1) % images.length;
+                    updateContent(currentIndex);
+                } else {
+                    alert('Incorrect answer. Please try again.');
+                }
+            });
+
+            questContainer.appendChild(questText);
+            questContainer.appendChild(inputField);
+            questContainer.appendChild(continueButton);
+            textContainer.appendChild(questContainer);
+        }
+
+        function startScene() {
+            introSection.style.opacity = '0';
+            introSection.style.transition = 'opacity 1s ease';
+            introSection.addEventListener('transitionend', () => {
+                introSection.style.display = 'none';
+                contentSection.style.display = 'flex';
+                contentSection.classList.add('fade-in-section');
+                updateContent(currentIndex);
+            });
+        }
+    </script>
+</body>
+</html>

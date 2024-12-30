@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Naughty Couple Game</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: url(images/chapter1/cardgame.webp); /* Romantic gradient */
+      color: #fff;
+      background-position: center;
+      background-size: cover;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .game-title {
+      font-size: 3rem;
+      color: #ffebc9;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px #ff306e;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 35px;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .card {
+      width: 120px;
+      height: 160px;
+      perspective: 1000px;
+      border-radius: 10px;
+    }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+      border-radius: 10px;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front,
+    .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-front {
+      background: linear-gradient(145deg, #ff1493, #ff69b4); /* Pink gradient */
+      color: #fff;
+      font-size: 2rem;
+      text-shadow: 1px 1px 3px #000;
+    }
+
+    .card-back {
+      background: linear-gradient(145deg, #ffe4e1, #ffb6c1); /* Light romantic gradient */
+      color: #333;
+      font-size: 1rem;
+      padding: 10px;
+      text-align: center;
+      transform: rotateY(180deg);
+      text-shadow: 1px 1px 2px #000;
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70%;
+      background: #ffe4e1;
+      color: #333;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .popup h2 {
+      margin-top: 0;
+      color: #ff306e;
+    }
+
+    .popup .popup-card {
+      width: 120px;
+      height: 160px;
+      margin: auto;
+      margin-bottom: 20px;
+      perspective: 1000px;
+    }
+
+    .popup .popup-card .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .popup .input-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .popup input {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .popup button {
+      padding: 10px 20px;
+      background: #ff1493;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .popup button:hover {
+      background: #ff306e;
+    }
+
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+
+    .popup_left{
+        width: 66%;
+
+    }
+    .popup_right{
+        width: 34%;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-left: 8%;
+        padding-right: 8%;
+    }
+    .popup_text{
+        border: 2px solid #ff1493;
+        height: 100%;
+        width: auto;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+    }
+    .show {
+      display: flex;
+    }
+    .complete-dares-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+#complete-dares-text {
+  font-size: 1.5rem;
+  color: #ffebc9;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  text-shadow: 1px 1px 3px #ff306e;
+  width: 200px;
+  display: inline-block;
+}
+
+  </style>
+</head>
+<body>
+  <h1 class="game-title">Let's Bring Some Spices</h1>
+  <div class="complete-dares-container">
+    <div id="complete-dares-text">Complete 5 Dares</div>
+  </div>
+  
+  <div class="card-grid">
+    <!-- Cards will be generated dynamically -->
+    <div class="card" data-dare="">
+      <div class="card-inner">
+        <div class="card-front">💖</div>
+        <div class="card-back"></div>
+      </div>
+    </div>
+    <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+      <div class="card" data-dare="">
+        <div class="card-inner">
+          <div class="card-front">💖</div>
+          <div class="card-back"></div>
+        </div>
+      </div>
+  </div>
+
+  <div class="popup-overlay"></div>
+  <div class="popup">
+    <div class="popup_left">
+        <h2>Your Dare</h2>
+        <div class="popup-card">
+            
+            <div class="card">
+              <div class="card-inner">
+                <div class="card-front">💖</div>
+                <div class="card-back"></div>
+              </div>
+            </div>
+          </div>
+          <div class="input-container">
+            <label for="dare-code">Enter Completion Code:</label>
+            <input type="text" id="dare-code" placeholder="Enter your code">
+            <button id="complete-dare">Complete Dare</button>
+          </div>
+    </div>
+    <div class="popup_right" >
+        <div class="popup_text" id="popupright"></div>
+    </div>
+    
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const dares = [
+        "Give your partner a 1-minute massage!",
+        "Whisper something romantic in your partner's ear!",
+        "Share your favorite memory of your partner!",
+        "Hold hands for the next 5 minutes!",
+        "Hug your partner tightly for 20 seconds!",
+        "Dance with your partner to your favorite song!",
+        "Kiss your partner's forehead!",
+        "Tell your partner one thing you adore about them!",
+        "Look into your partner's eyes for 30 seconds!",
+        "Plan a future date with your partner right now!",
+        "Dance with your partner to your favorite song!",
+        "Kiss your partner's forehead!",
+        "Tell your partner one thing you adore about them!",
+        "Look into your partner's eyes for 30 seconds!",
+        "Plan a future date with your partner right now!"
+      ];
+      const message = [
+        "Give your partner a 1-minute massage!",
+        "Whisper something romantic in your partner's ear!",
+        "Share your favorite memory of your partner!",
+        "Hold hands for the next 5 minutes!",
+        "Hug your partner tightly for 20 seconds!",
+        "Dance with your partner to your favorite song!",
+        "Kiss your partner's forehead!",
+        "Tell your partner one thing you adore about them!",
+        "Look into your partner's eyes for 30 seconds!",
+        "Plan a future date with your partner right now!",
+        "Dance with your partner to your favorite song!",
+        "Kiss your partner's forehead!",
+        "Tell your partner one thing you adore about them!",
+        "Look into your partner's eyes for 30 seconds!",
+        "Plan a future date with your partner right now!"
+      ]
+
+      // Shuffle the dares
+      const shuffledDares = dares.sort(() => Math.random() - 0.5);
+
+      const cards = document.querySelectorAll(".card");
+      const popup = document.querySelector(".popup");
+      const popupOverlay = document.querySelector(".popup-overlay");
+      const popupCard = popup.querySelector(".popup-card .card-back");
+      const dareCodeInput = document.getElementById("dare-code");
+      const completeDareButton = document.getElementById("complete-dare");
+      const completeDaresText = document.getElementById("complete-dares-text");
+      let flippedCard = null;
+      let completedDares = 0;
+
+      cards.forEach((card, index) => {
+        if (index < shuffledDares.length) {
+          const dare = shuffledDares[index];
+          const msg = message[index]
+          card.dataset.dare = dare;
+          card.querySelector(".card-back").textContent = dare;
+          document.getElementById("popupright").innerText=msg;
+        }
+
+        card.addEventListener("click", () => {
+          if (flippedCard && flippedCard !== card) {
+            flippedCard.classList.add("flipped");
+          }
+          card.classList.add("flipped");
+          flippedCard = card;
+
+          popupCard.textContent = card.dataset.dare;
+          popup.classList.add("show");
+          popupOverlay.classList.add("show");
+        });
+      });
+
+      completeDareButton.addEventListener("click", () => {
+        const code = dareCodeInput.value.trim();
+
+        if (code === "love123") { // Example success code
+          alert("Dare completed!");
+          completedDares++;
+          completeDaresText.textContent = `Complete ${5 - completedDares} Dares`;
+
+          if (completedDares === 5) {
+            window.location.href = "next_page.html"; // Redirect to a new page
+          }
+
+          popup.classList.remove("show");
+          popupOverlay.classList.remove("show");
+          dareCodeInput.value = "";
+        } else {
+          alert("Incorrect code. Try again!");
+        }
+      });
+
+      popupOverlay.addEventListener("click", () => {
+        popup.classList.remove("show");
+        popupOverlay.classList.remove("show");
+      });
+    });
+  </script>
+</body>
+</html>
